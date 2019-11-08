@@ -1,0 +1,47 @@
+#include <iostream>
+using namespace std;
+int a = 1;
+void put_snake(int n, int m, int** Snake)
+{
+	for (int j = 0; j < n; j++)
+	{
+		if (j % 2 == 0)
+		{
+			for (int i = m - 1; i >= 0; i--)
+			{
+				Snake[j][i] = a;
+				a++;
+			}
+		}
+		else
+		{
+			for (int i = 0; i < m; i++)
+			{
+				Snake[j][i] = a;
+				a++;
+			}
+		}
+	}
+}
+
+int main() {
+
+	int n, m;
+	cin >> n >> m;
+	int** Snake = new int* [n];
+
+	for (int i = 0; i < n; i++)
+	{
+		Snake[i] = new int[m];
+	}
+	put_snake(n, m, Snake);
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < m; j++)
+		{
+			cout << Snake[i][j] << '\t';
+		}
+		cout << endl;
+	}
+	return 0;
+}
