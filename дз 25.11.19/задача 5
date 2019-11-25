@@ -1,0 +1,44 @@
+#include <iostream>
+#include <cmath>
+
+using namespace std;
+
+int B(int a, int b)
+{
+	int result = 0;
+	while (a % (int)pow(b, result++) == 0);
+	return result - 2;
+}
+
+int main()
+{
+	int N;
+	cin >> N;
+	N += 2;
+	int* A = new int[N + 1];
+	A[0] = A[1] = 2;
+	for (int i = 2; i <= N; i++)
+	{
+		A[i] = 2;
+	}
+	for (int i = 2; i <= N; i++)
+	{
+		if (A[i] == 2)
+		{
+			for (int j = i + i; j <= N; j += i)
+			{
+				A[j] += B(j, i);
+			}
+		}
+	}
+
+	N -= 2;
+	for (int i = 2; i <= N; i++)
+	{
+		if (A[i] == 2 && (A[i + 2] == 4 || A[i + 2] == 2))
+		{
+			cout << i << " ";
+		}
+	}
+	return 0;
+}
