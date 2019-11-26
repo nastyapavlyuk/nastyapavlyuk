@@ -1,1 +1,45 @@
+#include <iostream>
+#include <cmath>
 
+using namespace std;
+
+int main()
+{
+	int n;
+	cin >> n;
+	int x, y = 0;
+	if (n % 2 == 0)
+	{
+		for (int i = pow(10, n / 2 - 1); i < pow(10, n / 2); i++)
+		{
+			x = i;
+			cout << i;
+			while (x != 0)
+			{
+				cout << x % 10;
+				x /= 10;
+			}
+			cout << endl;
+		}
+	}
+	else
+	{
+		for (int i = pow(10, n / 2 - 1); i < pow(10, n / 2); i++)
+		{
+			
+			for (int j = 0; j < 10; j++)
+			{
+				x = i;
+				cout << i << j;
+				while (x != 0)
+				{
+					cout << x % 10;
+					x /= 10;
+				}
+				cout << endl;
+			}
+		}
+	}
+
+	return 0;
+}
