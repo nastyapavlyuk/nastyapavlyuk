@@ -1,0 +1,234 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+vector<int> PushFront(vector<int> arr, int n) 
+{
+	vector<int> ner;
+	ner.push_back(n);
+	for (int i = 0; i < arr.size(); ++i)
+		ner.push_back(arr[i]);
+	return ner;
+}
+
+struct longInt
+{
+	bool prefix;
+	vector<int> nums;
+	longInt(string num)
+	{
+		int i = 0;
+		if (num[0] == '-')
+		{
+			prefix = true;
+			i = 1;
+		}
+		for (; i < num.length(); ++i)
+			nums.push_back(int(num[i]) - 48);
+		reverse(nums.begin(), nums.end());
+	}
+	void arcsize(int size)
+	{
+		int MySize = nums.size();
+		for (int i = 0; i < size - MySize; ++i)
+			nums.push_back(0);
+	}
+	longInt operator+(longInt& n)
+	{
+		longInt result("");
+		if (n.prefix != prefix)
+		{
+			if (!n.prefix)
+				return *this - n;
+			else
+				return n - *this;
+		}
+		result.prefix = prefix;
+		if (n.nums.size() > nums.size())
+			arcsize(n.nums.size());
+		else if (n.nums.size() < nums.size())
+			n.arcsize(nums.size());
+		result.nums.push_back((nums[0] + n.nums[0]) % 10);
+		for (int i = 1; i < nums.size(); ++i)
+			result.nums.push_back((nums[i] + n.nums[i] + ((nums[i - 1] + n.nums[i - 1]) / 10)) % 10);
+		return result;
+	}
+	bool operator>(longInt& t)
+	{
+		if (prefix && t.prefix)
+		{
+			if (t.nums.size() < nums.size())
+				return true;
+			else if (t.nums.size() == nums.size())
+			{
+				for (int i = nums.size() - 1; i >= 0; --i)
+				{
+					if (nums[i] > t.nums[i])
+						return true;
+					else if (nums[i] < t.nums[i])
+						return false;
+				}
+				return false;
+			}
+			else
+				return false;
+		}
+		else if (prefix && !t.prefix)
+			return true;
+		else if (!prefix && t.prefix)
+			return false;
+		else
+		{
+			if (t.nums.size() < nums.size())
+				return false;
+			else if (t.nums.size() == nums.size())
+			{
+				for (int i = nums.size() - 1; i >= 0; --i)
+				{
+					if (nums[i] > t.nums[i])
+						return false;
+					else if (nums[i] < t.nums[i])
+						return true;
+				}
+				return false;
+			}
+			else
+				return true;
+		}
+	}
+	bool operator==(longInt& t)
+	{
+		if (prefix != t.prefix)
+			return false;
+		if (t.nums.size() != nums.size())
+			return false;
+		for (int i = 0; i < nums.size(); ++i)
+			if (nums[i] != t.nums[i])
+				return false;
+		return true;
+	}
+	longInt operator-(longInt& n)
+	{
+		bool swape = false;
+		if (!prefix && n.prefix)
+			return n + *this;
+		else if (!n.prefix)
+		{
+			n.prefix = true;
+			return n + *this;
+		}
+		longInt result("");
+		if (n.nums.size() > nums.size())
+			arcsize(n.nums.size());
+		else if (n.nums.size() < nums.size())
+			n.arcsize(nums.size());
+		bool post = true;
+		if (n > * this)
+		{
+			post = false;
+			swap(n.nums, nums);
+			swape = true;
+		}
+		if (n == *this)
+		{
+			result.nums.push_back(0);
+			return result;
+		}
+		for (int i = 0; i < nums.size(); ++i)
+		{
+			if (n.nums[i] > nums[i])
+			{
+				--nums[i + 1];
+				nums[i] += 10;
+			}
+			result.nums.push_back(nums[i] - n.nums[i]);
+		}
+		result.prefix = post;
+		if(swape)
+			swap(n.nums, nums);
+		return result;
+	}
+	longInt operator*(longInt& n) 
+	{
+		longInt sum("0");
+		longInt BIG(""), SMALL("");
+		BIG = n;
+		SMALL = *this;
+		if (SMALL > BIG)
+			swap(SMALL.nums, BIG.nums);
+		for (int i = 0; i < SMALL.nums.size(); ++i) 
+		{
+			longInt result("");
+			result.nums.push_back((SMALL.nums[i] * BIG.nums[0]) % 10);
+			for (int j = 1; j < BIG.nums.size(); ++j)
+				result.nums.push_back((SMALL.nums[i] * BIG.nums[j] + ((SMALL.nums[i] * BIG.nums[j - 1]) / 10)) % 10);
+			for (int j = 0; j < i; ++j)
+				result.nums = PushFront(result.nums, 0);
+			sum = sum + result;
+		}
+		if (prefix == n.prefix)
+			sum.prefix = true;
+		else
+			sum.prefix = false;
+		return sum;
+	}
+	longInt operator/(longInt& n) 
+	{
+		longInt result("");
+		if (n > *this)
+		{
+			result.nums.push_back(0);
+			return result;
+		}
+		else if (*this == n) 
+		{
+			result.nums.push_back(1);
+			return result;
+		}
+		else 
+		{
+			longInt one("1");
+			for (longInt i("2"); true; i = i + one) 
+			{
+				if (i * n > * this)
+					return i - one;
+				else if (i * n == *this)
+					return i;
+			}
+		}
+	}
+	
+	/*ostream& operator<<(ostream& out, longInt& n)
+	{
+		string str = "";
+		for (int i = n.nums.size() - 1; i >= 0; --i)
+		{
+			str += char(n.nums[i] + 48);
+		}
+		reverse(str.begin(), str.end());
+		if (prefix)
+			return out << str;
+		else
+			return out << '-' << str;
+	}
+	istream& operator>>(istream& in,longInt& n) 
+	{
+		string str;
+		getline(in, str);
+		longInt New(str);
+		n = New;
+		return New;
+	}*/
+};
+
+int main()
+{
+	string str1 = "1285";
+	string str2 = "499";
+	longInt a(str1), b(str2);
+	longInt c = a * b;
+	for (int i = c.nums.size() - 1; i >= 0; --i)
+		cout << c.nums[i];
+	return 0;
+}
